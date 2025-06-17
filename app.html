@@ -1,9 +1,21 @@
 <!DOCTYPE html>
-<html lang="bn" class="bg-gray-100 dark:bg-gray-900">
+<html lang="bn" class="bg-gray-100 dark:bg-[#121212]">
 <head>
   <meta charset="UTF-8" />
   <title>Shuvo All Tool</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="সব বাংলা টুল একসাথে! PDF, Converter, Keyboard, Calculator এবং আরও অনেক কিছু!">
+  <meta property="og:title" content="Shuvo All Tool">
+  <meta property="og:description" content="অনলাইনে প্রয়োজনীয় সকল বাংলা টুল এক জায়গায়।">
+  <meta property="og:image" content="/thumbnail.jpg">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="bn_BD">
+  <meta name="theme-color" content="#7c3aed">
+
+  <!-- Favicon -->
+  <link rel="icon" href="/favicon.ico">
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com?version=3.4.1"></script>
@@ -13,43 +25,103 @@
 
   <!-- Initial Theme Load -->
   <script>
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else if (savedTheme === 'light') {
+      document.documentElement.classList.remove('dark');
+    } else {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      prefersDark ? document.documentElement.classList.add('dark') : document.documentElement.classList.remove('dark');
+    }
   </script>
 
   <style>
-    body { opacity: 0; transition: opacity 0.5s ease-in-out; }
-    body.loaded { opacity: 1; }
+    body { 
+      opacity: 0; 
+      pointer-events: none;
+      transition: opacity 0.5s ease-in-out; 
+    }
+    body.loaded { 
+      opacity: 1; 
+      pointer-events: auto;
+    }
+
+    /* Dark Mode Custom Colors */
+    .dark body {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+    .dark header {
+      background-color: #7c3aed; /* purple-600 */
+      box-shadow: 0 2px 8px rgba(124, 58, 237, 0.6);
+    }
+    .dark #loader {
+      background-color: #121212;
+    }
+    .dark #notice {
+      background-color: #372160; /* dark purple */
+      color: #d8cfff;
+    }
+    .dark #searchInput {
+      background-color: #2a1a5e;
+      border-color: #4c2fbd;
+      color: #e0dfff;
+    }
+    .dark #searchInput::placeholder {
+      color: #a99fff;
+    }
+    .dark #tools > div {
+      background-color: #2a1a5e; /* purple-900 */
+      color: #e0dfff;
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+      transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .dark #tools > div:hover {
+      background-color: #3b27a1; /* purple-800 */
+      box-shadow: 0 6px 20px rgba(124, 58, 237, 0.6);
+      transform: translateY(-4px);
+    }
+    .dark footer {
+      color: #a99fff;
+    }
   </style>
 </head>
-<body class="font-['Noto Sans Bengali','Roboto',sans-serif] text-gray-800 dark:text-gray-100 transition-colors duration-300 ease-in-out">
+
+<body class="font-['Noto Sans Bengali','Roboto',sans-serif] text-gray-800 dark:text-[#e0e0e0] transition-colors duration-300 ease-in-out">
 
   <!-- Loader -->
-  <div id="loader" class="fixed inset-0 bg-white dark:bg-gray-900 flex items-center justify-center z-50">
-    <div class="w-16 h-16 border-4 border-blue-500 border-t-transparent border-dashed rounded-full animate-spin"></div>
+  <div id="loader" class="fixed inset-0 bg-white dark:bg-[#121212] flex items-center justify-center z-50">
+    <div class="w-16 h-16 border-4 border-[#7c3aed] border-t-transparent border-dashed rounded-full animate-spin"></div>
   </div>
 
   <!-- Header -->
-  <header class="bg-blue-600 dark:bg-blue-800 text-white py-5 text-center text-3xl font-bold shadow-md">
+  <header class="text-white py-5 text-center text-3xl font-extrabold shadow-lg">
     🌟 Shuvo All Tool 🌟
   </header>
 
   <!-- Notice -->
-  <section id="notice" class="bg-yellow-100 dark:bg-yellow-300 text-yellow-900 max-w-3xl mx-auto mt-6 p-6 rounded-lg shadow-sm"></section>
+  <section id="notice" class="hidden max-w-3xl mx-auto mt-6 p-6 rounded-xl shadow-lg"></section>
 
-  <!-- Theme Toggle Button -->
-  <div class="text-center mt-4">
-    <button id="toggleTheme"
-      class="inline-flex items-center gap-2 bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-full shadow hover:bg-gray-300 dark:hover:bg-gray-700 transition">
-      🌗 থিম পরিবর্তন করুন
-    </button>
+  <!-- Search Bar -->
+  <div class="text-center mt-6 px-4">
+    <input id="searchInput" type="text" placeholder="🔍 এখানে লিখে টুল খুঁজুন..."
+      class="w-full sm:w-1/2 px-4 py-3 rounded-full border bg-[#2a1a5e] border-[#4c2fbd] text-[#e0dfff] placeholder-[#a99fff] focus:outline-none focus:ring-2 focus:ring-[#7c3aed] transition" />
   </div>
 
   <!-- Tools Grid -->
-  <section id="tools" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 max-w-6xl mx-auto px-4 py-10 transition"></section>
+  <section id="tools" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 max-w-6xl mx-auto px-4 py-10 transition">
+    <!-- Skeleton Loader -->
+    <template id="skeletonTemplate">
+      <div class="rounded-xl p-4 animate-pulse h-44 flex flex-col items-center bg-[#2a1a5e]">
+        <div class="w-20 h-20 bg-[#4c2fbd] rounded-full mb-3"></div>
+        <div class="w-3/4 h-4 bg-[#4c2fbd] rounded"></div>
+      </div>
+    </template>
+  </section>
 
   <!-- Footer -->
-  <footer class="text-center text-sm text-gray-500 dark:text-gray-400 py-4">
+  <footer class="text-center text-sm py-4">
     © 2025 Shuvo All Tool
   </footer>
 
@@ -71,72 +143,103 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
+    const toolsDiv = document.getElementById('tools');
+
+    // Show Skeletons
+    for (let i = 0; i < 10; i++) {
+      const template = document.getElementById('skeletonTemplate');
+      toolsDiv.appendChild(template.content.cloneNode(true));
+    }
+
+    let allTools = [];
+
+    const toolsRef = ref(db, 'Tools');
+    onValue(toolsRef, (snapshot) => {
+      allTools = [];
+      toolsDiv.innerHTML = ''; // Clear skeletons
+      snapshot.forEach((child) => {
+        const tool = child.val();
+        if (tool.status === "active") {
+          allTools.push(tool);
+        }
+      });
+      renderTools(allTools);
+      document.getElementById('loader').style.display = 'none';
+      document.body.classList.add('loaded');
+    }, {
+      onlyOnce: true
+    });
+
+    // Fallback for offline or error
+    setTimeout(() => {
+      if (!document.body.classList.contains('loaded')) {
+        toolsDiv.innerHTML = `<p class="col-span-full text-center text-red-500">❌ ইন্টারনেট সংযোগ নেই বা টুলস লোড হয়নি</p>`;
+        document.getElementById('loader').style.display = 'none';
+        document.body.classList.add('loaded');
+      }
+    }, 5000);
+
+    function renderTools(tools) {
+      toolsDiv.innerHTML = '';
+      if (tools.length === 0) {
+        toolsDiv.innerHTML = `<p class="col-span-full text-center text-gray-500 dark:text-gray-400">🔍 কোনো টুল পাওয়া যায়নি</p>`;
+        return;
+      }
+
+      const fragment = document.createDocumentFragment();
+      tools.forEach(tool => {
+        const card = document.createElement('div');
+        card.setAttribute('role', 'link');
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('aria-label', tool.name);
+        card.className = "rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition transform cursor-pointer flex flex-col items-center p-4 bg-white dark:bg-[#2a1a5e] text-gray-900 dark:text-[#e0dfff]";
+        card.onclick = () => window.open(tool.link, '_blank');
+        card.onkeypress = (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            window.open(tool.link, '_blank');
+          }
+        };
+
+        card.innerHTML = `
+          <img loading="lazy" src="${tool.icon}" alt="${tool.name}" class="w-20 h-20 object-contain mb-3">
+          <span class="text-center font-semibold text-gray-900 dark:text-[#e0dfff]">${tool.name}</span>
+        `;
+        fragment.appendChild(card);
+      });
+
+      toolsDiv.appendChild(fragment);
+    }
+
+    // Live Search
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase();
+      const filtered = allTools.filter(tool => tool.name.toLowerCase().includes(query));
+      renderTools(filtered);
+    });
+
     // Load Notice
     const noticeRef = ref(db, 'Notice');
     onValue(noticeRef, (snapshot) => {
       const notice = snapshot.val();
       const noticeBox = document.getElementById('notice');
-      if (notice) {
+      if (notice && notice.title && notice.body) {
+        noticeBox.classList.remove('hidden');
         noticeBox.innerHTML = `
           <h3 class="text-xl font-bold mb-2">${notice.title}</h3>
           <p class="text-base">${notice.body}</p>
         `;
       } else {
+        noticeBox.classList.add('hidden');
         noticeBox.innerHTML = "";
       }
-    }, (error) => {
-      console.error("Notice Load Error:", error);
-    });
-
-    // Load Tools
-    const toolsRef = ref(db, 'Tools');
-    onValue(toolsRef, (snapshot) => {
-      const toolsDiv = document.getElementById('tools');
-      toolsDiv.innerHTML = '';
-      let hasTool = false;
-
-      snapshot.forEach((child) => {
-        const tool = child.val();
-        if (tool.status === "active") {
-          hasTool = true;
-          toolsDiv.innerHTML += `
-            <div role="button" tabindex="0" aria-label="${tool.name}" onclick="window.open('${tool.link}', '_blank')" 
-              onkeypress="if(event.key==='Enter'){window.open('${tool.link}', '_blank')}" 
-              class="bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-lg hover:-translate-y-1 transition transform cursor-pointer flex flex-col items-center p-4">
-              <img loading="lazy" src="${tool.icon}" alt="${tool.name}" class="w-20 h-20 object-contain mb-3">
-              <span class="text-center font-semibold text-gray-900 dark:text-gray-100">${tool.name}</span>
-            </div>
-          `;
-        }
-      });
-
-      if (!hasTool) {
-        toolsDiv.innerHTML = `<p class="col-span-full text-center text-gray-500 dark:text-gray-400">🔍 কোনো টুল পাওয়া যায়নি</p>`;
-      }
-
-      // Hide loader
-      document.getElementById('loader').style.display = 'none';
-      document.body.classList.add('loaded');
-    }, (error) => {
-      console.error("Tools Load Error:", error);
-      document.getElementById('loader').style.display = 'none';
     });
   </script>
 
-  <!-- Theme Toggle JS -->
+  <!-- Fallback Loader Hide -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const themeToggle = document.getElementById('toggleTheme');
-
-      themeToggle?.addEventListener('click', () => {
-        const html = document.documentElement;
-        const isDark = html.classList.contains('dark');
-
-        html.classList.toggle('dark');
-        localStorage.setItem('theme', isDark ? 'light' : 'dark');
-      });
-
-      // Fallback loader remove
       setTimeout(() => {
         document.getElementById('loader').style.display = 'none';
         document.body.classList.add('loaded');
@@ -146,3 +249,5 @@
 
 </body>
 </html>
+
+User
